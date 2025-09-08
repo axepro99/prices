@@ -1,0 +1,35 @@
+name: EA Play Pro Prices (EUR)
+
+on:
+  workflow_dispatch: {}
+  schedule:
+    - cron: "0 6 * * *" # daily at 06:00 UTC (optional)
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install deps
+        run: npm ci || npm i
+
+      - name: Fetch prices
+        run: npm start
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ea-play-pro-prices
+          path: |
+            results.json
+            results.csv
