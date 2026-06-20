@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EMA35 · BTC 15min · PropFirm</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root, [data-theme="light"] {
+      --bg: #f5f3ee; --sf: #fdfcf9; --sf2: #edeae3; --sf3: #e3e0d8;
+      --bd: rgba(25,22,17,.10); --bd2: rgba(25,22,17,.18);
+      --tx: #1a170f; --mu: #6b6860; --fa: #c0bdb5;
+      --pr: #01696f; --pr2: rgba(1,105,111,.12);
+      --gr: #437a22; --gr2: rgba(67,122,34,.12);
+      --go: #b07a00; --go2: rgba(176,122,0,.12);
+      --rd: #a12c3a; --rd2: rgba(161,44,58,.12);
+      --pu: #6d3eb0; --pu2: rgba(109,62,176,.12);
+      --radius: 18px;
+    }
+    [data-theme="dark"] {
+      --bg: #0e0e0c; --sf: #161614; --sf2: #1e1e1b; --sf3: #272724;
+      --bd: rgba(255,255,255,.07); --bd2: rgba(255,255,255,.14);
+      --tx: #ece8df; --mu: #97938b; --fa: #3c3c39;
+      --pr: #52a2ab; --pr2: rgba(82,162,171,.14);
+      --gr: #7fba57; --gr2: rgba(127,186,87,.13);
+      --go: #ebb246; --go2: rgba(235,178,70,.13);
+      --rd: #dd6974; --rd2: rgba(221,105,116,.13);
+      --pu: #a86fdf; --pu2: rgba(168,111,223,.13);
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased}
+    body{font-family:Inter,system-ui,sans-serif;background:var(--bg);color:var(--tx);line-height:1.6;font-size:14px}
+    ::-webkit-scrollbar{width:4px;height:4px}::-webkit-scrollbar-thumb{background:var(--fa);border-radius:8px}
+
+    /* NAV */
+    nav{position:sticky;top:0;z-index:30;backdrop-filter:blur(14px);
+      background:color-mix(in srgb,var(--bg) 85%,transparent);
+      border-bottom:1px solid var(--bd)}
+    .nav-in{max-width:1240px;margin:0 auto;padding:0 22px;height:56px;
+      display:flex;align-items:center;justify-content:space-between;gap:16px}
+    .brand{display:flex;align-items:center;gap:11px}
+    .logo{width:38px;height:38px;border-radius:11px;background:linear-gradient(135deg,var(--pr),#0f828c);
+      display:grid;place-items:center;font-weight:800;color:#fff;font-size:13px;letter-spacing:-.5px}
+    .brand-t{font-size:14px;font-weight:700}
+    .brand-s{font-size:11px;color:var(--mu)}
+    .nav-r{display:flex;gap:8px;align-items:center}
+    .pill{display:inline-flex;align-items:center;gap:5px;padding:5px 11px;border-radius:999px;
+      font-size:11px;font-weight:700;letter-spacing:.04em}
+    .p-pr{background:var(--pr2);color:var(--pr)}.p-gr{background:var(--gr2);color:var(--gr)}
+    .p-go{background:var(--go2);color:var(--go)}.p-rd{background:var(--rd2);color:var(--rd)}
+    .p-pu{background:var(--pu2);color:var(--pu)}
+    .tgl{width:36px;height:36px;border-radius:10px;border:1px solid var(--bd2);
+      background:var(--sf2);color:var(--mu);cursor:pointer;display:grid;place-items:center;transition:all 140ms}
+    .tgl:hover{color:var(--tx);border-color:var(--pr)}
+
+    /* TABS */
+    .tabs{background:var(--sf);border-bottom:1px solid var(--bd);
+      display:flex;gap:2px;padding:0 22px;overflow-x:auto;max-width:100%}
+    .tab{padding:13px 18px;font-size:13px;font-weight:600;color:var(--mu);cursor:pointer;
+      border:none;background:none;border-bottom:2px solid transparent;
+      transition:all 140ms;white-space:nowrap;display:flex;align-items:center;gap:7px}
+    .tab:hover{color:var(--tx)}.tab.on{color:var(--pr);border-bottom-color:var(--pr)}
+    .pane{display:none}.pane.on{display:block}
+
+    /* LAYOUT */
+    .wrap{max-width:1240px;margin:0 auto;padding:24px 22px 60px}
+    .section-lbl{font-size:10px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;
+      color:var(--mu);margin-bottom:14px;display:flex;align-items:center;gap:8px}
+    .section-lbl::after{content:'';flex:1;height:1px;background:var(--bd)}
+
+    /* CARD */
+    .card{background:var(--sf);border:1px solid var(--bd);border-radius:var(--radius)}
+    .g2{display:grid;grid-template-columns:1.2fr .8fr;gap:14px}
+    .g3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+    .g4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+
+    /* HERO */
+    .hero-card{padding:28px}
+    .hero-eyebrow{display:inline-flex;gap:8px;align-items:center;padding:7px 13px;
+      border-radius:999px;background:var(--pr2);color:var(--pr);
+      font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;margin-bottom:16px}
+    .hero-h{font-size:clamp(2rem,1rem+3.5vw,4rem);line-height:.94;letter-spacing:-.04em;margin-bottom:14px}
+    .hero-p{color:var(--mu);font-size:15px;max-width:64ch;margin-bottom:20px}
+    .kpi-row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+    .kpi-sm{padding:12px 14px;border-radius:14px;background:var(--sf2);border:1px solid var(--bd)}
+    .kpi-k{font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--mu);margin-bottom:4px}
+    .kpi-v{font-weight:800;font-size:22px;font-family:'JetBrains Mono',monospace}
+    .hero-side{padding:22px;display:flex;flex-direction:column;gap:12px}
+    .check-item{display:grid;grid-template-columns:30px 1fr;gap:10px;align-items:start;
+      padding:12px 13px;border-radius:14px;background:var(--sf2);border:1px solid var(--bd)}
+    .ci-ico{width:30px;height:30px;border-radius:9px;background:var(--pr2);color:var(--pr);
+      display:grid;place-items:center;font-weight:800}
+
+    /* BLOCKS */
+    .block{padding:22px}
+    .step{width:34px;height:34px;border-radius:11px;background:var(--pr2);color:var(--pr);
+      display:grid;place-items:center;font-weight:800;margin-bottom:12px}
+    .block h4{font-size:17px;margin-bottom:8px}
+    .block p,.block ul{color:var(--mu);font-size:14px}
+    .block ul{padding-left:18px;margin-top:8px}
+    .block ul li{margin-bottom:4px}
+
+    /* RULE LIST */
+    .rule-list{display:grid;gap:10px}
+    .rule{padding:15px;border-radius:14px;background:var(--sf2);border:1px solid var(--bd)}
+    .rule strong{display:flex;align-items:center;gap:8px;margin-bottom:7px;font-size:14px}
+    .rule p{color:var(--mu);font-size:13px;margin:0}
+    .rnum{width:26px;height:26px;border-radius:8px;background:var(--pr2);color:var(--pr);
+      display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0}
+    code{font-family:'JetBrains Mono',monospace;font-size:12px;padding:2px 7px;
+      border-radius:7px;background:var(--sf3);color:var(--pr)}
+
+    /* FLOW */
+    .flow{display:grid;gap:9px}
+    .fl{display:flex;gap:11px;align-items:flex-start;padding:11px 13px;
+      border-radius:14px;background:var(--sf2);border:1px solid var(--bd)}
+    .fl-dot{width:10px;height:10px;border-radius:50%;background:var(--pr);flex-shrink:0;margin-top:5px;
+      box-shadow:0 0 0 4px color-mix(in srgb,var(--pr) 18%,transparent)}
+    .fl strong{font-size:13px}.fl span{color:var(--mu);font-size:13px}
+
+    /* BANNER */
+    .banner{padding:16px 18px;border-radius:16px;
+      background:linear-gradient(135deg,color-mix(in srgb,var(--gr) 14%,transparent),transparent 60%),var(--sf);
+      border:1px solid color-mix(in srgb,var(--gr) 32%,var(--bd))}
+    .banner h4{font-size:15px;margin-bottom:6px}.banner p{color:var(--mu);font-size:13px}
+
+    /* TABLE */
+    .tbl-card{overflow:hidden}
+    .tbl-scroll{overflow-x:auto}
+    table{width:100%;border-collapse:collapse;font-size:13px}
+    th,td{padding:12px 14px;border-bottom:1px solid var(--bd);vertical-align:top}
+    th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--mu);background:var(--sf2)}
+    tr:last-child td{border-bottom:none}
+    tbody tr:hover{background:var(--sf2)}
+    .ok{color:var(--gr);font-weight:700}.bad{color:var(--rd);font-weight:700}.warn{color:var(--go);font-weight:700}
+    .mono{font-family:'JetBrains Mono',monospace}
+    td strong{font-size:13px}
+
+    /* SCENARIO CARDS */
+    .scenario{padding:18px;border-radius:16px}
+    .sc-long{background:linear-gradient(135deg,var(--gr2),transparent 60%),var(--sf);border:1px solid color-mix(in srgb,var(--gr) 28%,var(--bd))}
+    .sc-short{background:linear-gradient(135deg,var(--rd2),transparent 60%),var(--sf);border:1px solid color-mix(in srgb,var(--rd) 28%,var(--bd))}
+    .sc-no{background:linear-gradient(135deg,color-mix(in srgb,var(--mu) 10%,transparent),transparent 60%),var(--sf);border:1px solid var(--bd)}
+    .sc-title{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+    .sc-dot{width:10px;height:10px;border-radius:50%}
+    .sc-title h4{font-size:15px;margin:0}
+    .sc-steps{display:grid;gap:7px}
+    .sc-step{display:flex;gap:9px;align-items:flex-start;font-size:13px;color:var(--mu)}
+    .sc-n{font-weight:700;color:var(--tx);min-width:18px}
+
+    /* CHECKLIST pre-trade */
+    .chk-list{display:grid;gap:8px}
+    .chk{display:flex;gap:10px;align-items:center;padding:10px 13px;border-radius:12px;
+      background:var(--sf2);border:1px solid var(--bd);font-size:13px}
+    .chk-ico{font-size:15px;flex-shrink:0}
+
+    /* SIGNAL BOX */
+    .signal-box{padding:16px;border-radius:14px;border:1px solid var(--bd);background:var(--sf2);margin-bottom:10px}
+    .signal-box h5{font-size:13px;margin-bottom:8px;display:flex;align-items:center;gap:8px}
+    .signal-box ul{padding-left:18px;color:var(--mu);font-size:13px}
+    .signal-box ul li{margin-bottom:4px}
+    .sb-gr h5{color:var(--gr)}.sb-rd h5{color:var(--rd)}.sb-go h5{color:var(--go)}
+
+    /* FOOTER */
+    .foot{text-align:center;font-size:11px;color:var(--fa);padding:20px 0 40px}
+
+    @media(max-width:960px){.g2,.g3{grid-template-columns:1fr}.kpi-row{grid-template-columns:repeat(2,1fr)}}
+    @media(max-width:600px){.g4{grid-template-columns:repeat(2,1fr)}.wrap{padding:14px 14px 48px}.tabs{padding:0 12px}}
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-in">
+    <div class="brand">
+      <div class="logo">E35</div>
+      <div>
+        <div class="brand-t">EMA 35 · BTC/USDT · 15min</div>
+        <div class="brand-s">Modelo PropFirm · No binario · Spot / Futuros</div>
+      </div>
+    </div>
+    <div class="nav-r">
+      <span class="pill p-pr">EMA 35</span>
+      <span class="pill p-go">ADX &gt; 15</span>
+      <span class="pill p-pu">DI+/DI−</span>
+      <span class="pill p-gr">RR 2:1</span>
+      <button class="tgl" data-theme-toggle aria-label="Cambiar tema">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<div class="tabs">
+  <button class="tab on" onclick="tab('overview',this)">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+    Estrategia
+  </button>
+  <button class="tab" onclick="tab('entry',this)">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/></svg>
+    Entradas LONG / SHORT
+  </button>
+  <button class="tab" onclick="tab('noentry',this)">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
+    Cuándo NO entrar
+  </button>
+  <button class="tab" onclick="tab('propfirm',this)">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+    Reglas PropFirm
+  </button>
+  <button class="tab" onclick="tab('checklist',this)">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+    Checklist pre-trade
+  </button>
+</div>
+
+<!-- ════════════ ESTRATEGIA ════════════ -->
+<div id="pane-overview" class="pane on">
+<div class="wrap">
+
+  <div class="g2" style="margin-bottom:14px">
+    <div class="card hero-card">
+      <div class="hero-eyebrow">BTC/USDT · 15min · Futuros / Spot</div>
+      <h2 class="hero-h">EMA 35 como zona de<br>retroceso operativa</h2>
+      <p class="hero-p">La estrategia opera a favor de tendencia esperando que el precio regrese a la EMA 35 y confirme continuación. No se opera la media como señal de cruce, sino como zona dinámica de soporte y resistencia. Los filtros ADX y DI eliminan entradas en rango o en contra de la presión dominante.</p>
+      <div class="kpi-row">
+        <div class="kpi-sm"><div class="kpi-k">Activo</div><div class="kpi-v" style="font-size:16px">BTC/USDT</div></div>
+        <div class="kpi-sm"><div class="kpi-k">Timeframe</div><div class="kpi-v">15 min</div></div>
+        <div class="kpi-sm"><div class="kpi-k">Modelo</div><div class="kpi-v" style="font-size:14px">PropFirm</div></div>
+        <div class="kpi-sm"><div class="kpi-k">RR objetivo</div><div class="kpi-v">2 : 1</div></div>
+      </div>
+    </div>
+    <div class="card hero-side">
+      <span class="pill p-pr" style="margin-bottom:4px">Idea central</span>
+      <div class="check-item"><div class="ci-ico">1</div><div><strong>Tendencia activa</strong><div style="font-size:12px;color:var(--mu)">La EMA 35 debe estar inclinada y el precio no debe estar girando repetidamente sobre ella.</div></div></div>
+      <div class="check-item"><div class="ci-ico">2</div><div><strong>Retroceso limpio</strong><div style="font-size:12px;color:var(--mu)">El precio regresa a tocar la media sin haberse alejado demasiado ni entrar en zona de swing.</div></div></div>
+      <div class="check-item"><div class="ci-ico">3</div><div><strong>Confirmación + filtros</strong><div style="font-size:12px;color:var(--mu)">ADX &gt; 15 y DI alineado. La vela de confirmación cierra en dirección de la tendencia.</div></div></div>
+      <div class="check-item"><div class="ci-ico">4</div><div><strong>Gestión fija</strong><div style="font-size:12px;color:var(--mu)">Stop técnico, riesgo 0.5%, TP a 2× el SL desde la entrada. Sin gestionar a discreción.</div></div></div>
+    </div>
+  </div>
+
+  <div class="section-lbl">Lógica de la operativa</div>
+  <div class="g3" style="margin-bottom:14px">
+    <div class="card block">
+      <div class="step">1</div>
+      <h4>Sesgo de mercado</h4>
+      <p>Mira si la EMA 35 tiene pendiente definida. Alcista = precio sobre la media con impulsos crecientes. Bajista = precio bajo la media con impulsos decrecientes. Sin pendiente clara, no hay sesgo.</p>
+      <ul>
+        <li>No entres contra tendencia.</li>
+        <li>Si la EMA está plana, es rango: usa otra ventana temporal o activo.</li>
+      </ul>
+    </div>
+    <div class="card block">
+      <div class="step">2</div>
+      <h4>Pullback a la EMA</h4>
+      <p>El precio avanza en dirección de la tendencia y luego retrocede hasta tocar o acercarse a la EMA 35. Ese es el momento de alerta. El pullback debe ser ordenado, no una vela de impulso contrario fuerte.</p>
+      <ul>
+        <li>Un toque limpio vale más que uno que perfora la media con fuerza.</li>
+        <li>Si el precio lleva muchas velas lejos de la media, el setup pierde calidad.</li>
+      </ul>
+    </div>
+    <div class="card block">
+      <div class="step">3</div>
+      <h4>Entrada y gestión</h4>
+      <p>Confirma que ADX &gt; 15 y que el DI correcto supera al contrario. Busca cierre de vela confirmando reanudación del impulso o vela de rechazo en la zona EMA. Entonces ejecutas con stop y objetivo fijos.</p>
+      <ul>
+        <li>No entres si el cuerpo de la vela ya se alejó mucho de la media.</li>
+        <li>RR mínimo 2:1. Si no cabe el stop, skip.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section-lbl">Reglas operativas</div>
+  <div class="g2">
+    <div class="card block">
+      <div class="rule-list">
+        <div class="rule"><strong><span class="rnum">1</span>Tendencia base — pendiente EMA 35</strong><p>Solo LONG si EMA 35 tiene pendiente alcista y precio por encima. Solo SHORT si EMA 35 tiene pendiente bajista y precio por debajo.</p></div>
+        <div class="rule"><strong><span class="rnum">2</span>Filtro fuerza — ADX</strong><p>Opera únicamente cuando <code>ADX &gt; 15</code>. Por debajo = rango o falta de momentum. No se ejecuta ninguna entrada.</p></div>
+        <div class="rule"><strong><span class="rnum">3</span>Filtro direccional — DI+ / DI−</strong><p>LONG requiere <code>DI+ &gt; DI−</code>. SHORT requiere <code>DI− &gt; DI+</code>. Sin esta alineación la entrada se descarta aunque el precio toque la EMA.</p></div>
+        <div class="rule"><strong><span class="rnum">4</span>Entrada — tres opciones válidas</strong><p>1) Cierre de vela directamente sobre la EMA. 2) Esperar vela de confirmación siguiente. 3) Vela de rechazo/mecha en la zona EMA (más conservador).</p></div>
+        <div class="rule"><strong><span class="rnum">5</span>Stop loss</strong><p>Stop técnico: por debajo del swing más reciente en LONG, por encima en SHORT. No forzar un stop dentro del ruido de la zona EMA.</p></div>
+        <div class="rule"><strong><span class="rnum">6</span>Take profit — RR 2:1</strong><p>TP = entrada + (distancia_SL × 2). Fijo en backtest. En operativa real puedes cerrar parcial, pero el modelo base usa RR fijo para ser reproducible.</p></div>
+      </div>
+    </div>
+    <div class="card block">
+      <h4 style="margin-bottom:14px">Flujo paso a paso</h4>
+      <div class="flow">
+        <div class="fl"><div class="fl-dot"></div><div><strong>Detecta la tendencia.</strong> <span>EMA 35 inclinada y precio del lado correcto.</span></div></div>
+        <div class="fl"><div class="fl-dot"></div><div><strong>Espera el retroceso.</strong> <span>Precio vuelve a la zona de la media. No persigas.</span></div></div>
+        <div class="fl"><div class="fl-dot"></div><div><strong>Comprueba ADX.</strong> <span>Debe estar por encima de 15 en el momento del toque.</span></div></div>
+        <div class="fl"><div class="fl-dot"></div><div><strong>Valida DI.</strong> <span>La presión compradora o vendedora domina en ese instante.</span></div></div>
+        <div class="fl"><div class="fl-dot"></div><div><strong>Espera confirmación de vela.</strong> <span>No entres en mitad de una vela extendida.</span></div></div>
+        <div class="fl"><div class="fl-dot"></div><div><strong>Ejecuta con stop y TP fijos.</strong> <span>Riesgo 0.5% del balance. Deja correr hasta el objetivo.</span></div></div>
+      </div>
+      <div class="banner" style="margin-top:14px">
+        <h4>¿Por qué el 15 min en BTC?</h4>
+        <p>BTC tiene suficiente liquidez para que los retrocesos a la EMA sean limpios y los filtros ADX/DI funcionen. Timeframes menores (1–5 min) generan demasiado ruido; mayores (4H–1D) requieren aguantar drawdowns amplios sin los límites diarios de una PropFirm.</p>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- ════════════ ENTRADAS ════════════ -->
+<div id="pane-entry" class="pane">
+<div class="wrap">
+
+  <div class="section-lbl">Setup LONG</div>
+  <div class="g2" style="margin-bottom:14px">
+    <div class="scenario sc-long">
+      <div class="sc-title"><div class="sc-dot" style="background:var(--gr)"></div><h4>Entrada LONG — retroceso a EMA en tendencia alcista</h4></div>
+      <div class="sc-steps">
+        <div class="sc-step"><div class="sc-n">1.</div><div>EMA 35 con pendiente <strong>positiva</strong>. Precio haciendo máximos y mínimos crecientes.</div></div>
+        <div class="sc-step"><div class="sc-n">2.</div><div>Precio retrocede hasta <strong>tocar o superponer</strong> con la EMA 35 desde arriba (low ≤ EMA ≤ high).</div></div>
+        <div class="sc-step"><div class="sc-n">3.</div><div><code>ADX &gt; 15</code> y <code>DI+ &gt; DI−</code> en ese momento.</div></div>
+        <div class="sc-step"><div class="sc-n">4.</div><div>La vela cierra por <strong>encima</strong> de la apertura (o esperas confirmación de la siguiente).</div></div>
+        <div class="sc-step"><div class="sc-n">5.</div><div>Entrada en apertura de siguiente vela. <strong>Stop</strong> bajo el mínimo del pullback. <strong>TP</strong> = 2× SL.</div></div>
+      </div>
+    </div>
+    <div class="card block">
+      <div class="signal-box sb-gr"><h5>✅ Señal LONG válida</h5><ul><li>EMA inclinada arriba</li><li>Pullback limpio a la media</li><li>ADX &gt; 15 en el momento del toque</li><li>DI+ supera DI−</li><li>Vela de confirmación alcista sobre la EMA</li></ul></div>
+      <div class="signal-box sb-go"><h5>⚠️ Señal LONG dudosa</h5><ul><li>Pullback profundo que perfora mucho la EMA</li><li>ADX entre 15 y 18 (zona de incertidumbre)</li><li>Primera vela de confirmación con cuerpo pequeño</li></ul></div>
+    </div>
+  </div>
+
+  <div class="section-lbl">Setup SHORT</div>
+  <div class="g2">
+    <div class="scenario sc-short">
+      <div class="sc-title"><div class="sc-dot" style="background:var(--rd)"></div><h4>Entrada SHORT — retroceso a EMA en tendencia bajista</h4></div>
+      <div class="sc-steps">
+        <div class="sc-step"><div class="sc-n">1.</div><div>EMA 35 con pendiente <strong>negativa</strong>. Precio haciendo máximos y mínimos decrecientes.</div></div>
+        <div class="sc-step"><div class="sc-n">2.</div><div>Precio sube hasta <strong>tocar</strong> la EMA 35 desde abajo (low ≤ EMA ≤ high).</div></div>
+        <div class="sc-step"><div class="sc-n">3.</div><div><code>ADX &gt; 15</code> y <code>DI− &gt; DI+</code> en ese momento.</div></div>
+        <div class="sc-step"><div class="sc-n">4.</div><div>La vela cierra por <strong>debajo</strong> de la apertura confirmando rechazo.</div></div>
+        <div class="sc-step"><div class="sc-n">5.</div><div>Entrada en apertura de siguiente vela. <strong>Stop</strong> sobre el máximo del pullback. <strong>TP</strong> = 2× SL.</div></div>
+      </div>
+    </div>
+    <div class="card block">
+      <div class="signal-box sb-rd"><h5>✅ Señal SHORT válida</h5><ul><li>EMA inclinada abajo</li><li>Rebote limpio a la media desde debajo</li><li>ADX &gt; 15 en el momento del toque</li><li>DI− supera DI+</li><li>Vela de confirmación bajista bajo la EMA</li></ul></div>
+      <div class="signal-box sb-go"><h5>⚠️ Los shorts son el punto fuerte</h5><ul><li>En el backtest de Versión B el WR SHORT fue más alto</li><li>BTC en tendencia bajista con la EMA como resistencia dinámica es el setup más limpio</li><li>No descartes los shorts por miedo: son el corazón de la estrategia</li></ul></div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- ════════════ CUÁNDO NO ENTRAR ════════════ -->
+<div id="pane-noentry" class="pane">
+<div class="wrap">
+
+  <div class="section-lbl">Situaciones que invalidan la entrada</div>
+  <div class="g3" style="margin-bottom:14px">
+    <div class="card block">
+      <div class="step" style="background:var(--rd2);color:var(--rd)">✗</div>
+      <h4>Mercado en rango</h4>
+      <p>Si la EMA 35 está plana o el precio cruza la media repetidamente de arriba abajo, estamos en rango. El ADX confirmará esto estando bajo 15.</p>
+      <ul>
+        <li>El precio choca contra la EMA pero vuelve.</li>
+        <li>No hay impulsos ni estructura clara.</li>
+        <li>Acción: skip completo, busca otro momento.</li>
+      </ul>
+    </div>
+    <div class="card block">
+      <div class="step" style="background:var(--rd2);color:var(--rd)">✗</div>
+      <h4>Zona de swing (rebotes menguantes)</h4>
+      <p>Si los impulsos no superan al anterior, el mercado está agotando la tendencia. El siguiente movimiento probable es una ruptura o reversión, no continuación.</p>
+      <ul>
+        <li>Máximos y mínimos ya no son crecientes.</li>
+        <li>El retroceso es más profundo que los anteriores.</li>
+        <li>Acción: esperar redefinición de estructura.</li>
+      </ul>
+    </div>
+    <div class="card block">
+      <div class="step" style="background:var(--rd2);color:var(--rd)">✗</div>
+      <h4>Vela demasiado extendida</h4>
+      <p>Si la vela de entrada ya ha recorrido la mayor parte del espacio hasta el TP, el RR deja de tener sentido. No persigas entradas que ya pasaron.</p>
+      <ul>
+        <li>Cuerpo de vela muy largo = precio lejos de EMA.</li>
+        <li>El stop quedaría demasiado ajustado o el TP demasiado cerca.</li>
+        <li>Acción: dejar pasar, esperar siguiente setup.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section-lbl">Tabla de señales — válidas vs bloqueadas</div>
+  <div class="card tbl-card">
+    <div class="tbl-scroll">
+      <table>
+        <thead><tr><th>Situación</th><th>ADX</th><th>DI</th><th>EMA</th><th>¿Opera?</th><th>Motivo</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Tendencia alcista + pullback limpio</strong></td><td class="ok mono">24</td><td class="ok">DI+ &gt; DI−</td><td class="ok">Inclinada +</td><td><span style="background:var(--gr2);color:var(--gr);border-radius:5px;padding:2px 8px;font-size:11px;font-weight:700">✓ LONG</span></td><td style="color:var(--mu)">Setup ideal</td></tr>
+          <tr><td><strong>Tendencia bajista + rebote a EMA</strong></td><td class="ok mono">20</td><td class="ok">DI− &gt; DI+</td><td class="ok">Inclinada −</td><td><span style="background:var(--rd2);color:var(--rd);border-radius:5px;padding:2px 8px;font-size:11px;font-weight:700">✓ SHORT</span></td><td style="color:var(--mu)">Setup ideal</td></tr>
+          <tr><td><strong>Toque EMA pero ADX bajo</strong></td><td class="bad mono">11</td><td class="warn">Cruzados</td><td class="warn">Plana</td><td><span style="background:var(--sf3);color:var(--mu);border-radius:5px;padding:2px 8px;font-size:11px;font-weight:700">✗ SKIP</span></td><td style="color:var(--mu)">Rango, fuerza insuficiente</td></tr>
+          <tr><td><strong>Toque EMA, DI contrario</strong></td><td class="warn mono">18</td><td class="bad">DI contrario</td><td class="ok">Inclinada +</td><td><span style="background:var(--sf3);color:var(--mu);border-radius:5px;padding:2px 8px;font-size:11px;font-weight:700">✗ SKIP</span></td><td style="color:var(--mu)">Presión en contra</td></tr>
+          <tr><td><strong>Swing agotado, impulsos menguantes</strong></td><td class="warn mono">16</td><td class="warn">Cruzándose</td><td class="warn">Perdiendo pendiente</td><td><span style="background:var(--sf3);color:var(--mu);border-radius:5px;padding:2px 8px;font-size:11px;font-weight:700">✗ SKIP</span></td><td style="color:var(--mu)">Fin de tendencia probable</td></tr>
+          <tr><td><strong>Vela extendida lejos de EMA</strong></td><td class="ok mono">22</td><td class="ok">Correcto</td><td class="ok">Inclinada</td><td><span style="background:var(--sf3);color:var(--mu);border-radius:5px;padding:2px 8px;font-size:11px;font-weight:700">✗ SKIP</span></td><td style="color:var(--mu)">RR roto, entrada tardía</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- ════════════ PROPFIRM ════════════ -->
+<div id="pane-propfirm" class="pane">
+<div class="wrap">
+
+  <div class="section-lbl">Límites de cuenta</div>
+  <div class="card tbl-card" style="margin-bottom:14px">
+    <div class="tbl-scroll">
+      <table>
+        <thead><tr><th>Regla</th><th>Límite oficial</th><th>Límite interno recomendado</th><th>Aplicación diaria</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Drawdown diario</strong></td><td class="bad">−5% del balance</td><td class="warn">Parar en −4.5%</td><td style="color:var(--mu)">Cuenta diaria cuánto has perdido desde la apertura del día. Si llegás al −4.5%, paras aunque el límite oficial sea −5%.</td></tr>
+          <tr><td><strong>Drawdown total</strong></td><td class="bad">−10% del balance inicial</td><td class="warn">Parar en −9%</td><td style="color:var(--mu)">Nunca recuperes forzando. El buffer del 1% evita un error en la última operación que te saque de la cuenta.</td></tr>
+          <tr><td><strong>Profit target</strong></td><td class="ok">+10% del balance</td><td class="ok">Alcanzar en ritmo normal</td><td style="color:var(--mu)">No aceleres para cumplir antes. Distribuye el profit en varios días con consistencia.</td></tr>
+          <tr><td><strong>Días mínimos operados</strong></td><td class="warn">4 días</td><td class="warn">Al menos 4</td><td style="color:var(--mu)">Se cumple fácilmente. Evita hacer todo el profit en 1–2 días que puede bloquear el payout.</td></tr>
+          <tr><td><strong>Consistencia</strong></td><td class="warn">Mejor día ≤ 40% del profit</td><td class="warn">Mejor día ≤ 35%</td><td style="color:var(--mu)">Si un día ganas más de lo que deberías dado el riesgo por trade, revisa el tamaño de posición. La consistencia no es solo mental, es matemática.</td></tr>
+          <tr><td><strong>Riesgo por trade</strong></td><td colspan="2" class="ok">0.5% del balance</td><td style="color:var(--mu)">Fijo e inamovible. Con balance de $200k = $1,000 máx por trade. Esto hace que ninguna racha te destruya.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="section-lbl">Cuándo está bloqueada la retirada</div>
+  <div class="g2">
+    <div class="card block">
+      <div class="rule-list">
+        <div class="rule"><strong><span class="rnum" style="background:var(--rd2);color:var(--rd)">!</span>Profit aún no alcanza +10%</strong><p>Es el bloqueador más común. Hasta que el beneficio neto no supere el 10% del capital inicial, no puedes solicitar payout. Sin atajos.</p></div>
+        <div class="rule"><strong><span class="rnum" style="background:var(--rd2);color:var(--rd)">!</span>Menos de 4 días operados</strong><p>Las PropFirm quieren ver actividad consistente. No importa si ganaste el 10% en 2 días: necesitas al menos 4 días con operaciones reales.</p></div>
+        <div class="rule"><strong><span class="rnum" style="background:var(--rd2);color:var(--rd)">!</span>Regla de consistencia violada</strong><p>Si un solo día concentra más del 40% de todo tu profit acumulado, el payout puede quedar retenido aunque el resto esté perfecto.</p></div>
+      </div>
+    </div>
+    <div class="card block">
+      <div class="banner">
+        <h4>Cálculo del payout</h4>
+        <p>Una vez elegible: la firma te paga el <strong>80% del profit</strong>. El 20% restante queda como retención. Ejemplo con $200k y +14.5% de profit ($29,000): payout = $23,200.</p>
+      </div>
+      <div class="rule-list" style="margin-top:14px">
+        <div class="rule"><strong><span class="rnum" style="background:var(--gr2);color:var(--gr)">✓</span>¿Cuándo la retirada está disponible?</strong><p>Cuando el profit total ≥ +10%, los días operados ≥ 4, ningún día único supera el 40% del profit y el drawdown nunca tocó los límites. Todo a la vez.</p></div>
+        <div class="rule"><strong><span class="rnum" style="background:var(--gr2);color:var(--gr)">✓</span>Gestión del ciclo</strong><p>Una vez cobrado el payout, empieza el siguiente ciclo. Mantén el mismo riesgo por trade aunque la cuenta haya crecido. No escales antes de tener 2 ciclos consistentes.</p></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- ════════════ CHECKLIST ════════════ -->
+<div id="pane-checklist" class="pane">
+<div class="wrap">
+
+  <div class="section-lbl">Checklist antes de cada entrada</div>
+  <div class="g3" style="margin-bottom:14px">
+    <div class="card block">
+      <h4 style="margin-bottom:14px">📍 Contexto</h4>
+      <div class="chk-list">
+        <div class="chk"><div class="chk-ico">📈</div>¿La EMA 35 tiene pendiente definida?</div>
+        <div class="chk"><div class="chk-ico">🕯️</div>¿Los impulsos superan al anterior?</div>
+        <div class="chk"><div class="chk-ico">🔍</div>¿El precio está cerca de la EMA (no lejos)?</div>
+        <div class="chk"><div class="chk-ico">🚫</div>¿No estamos en zona de swing agotado?</div>
+      </div>
+    </div>
+    <div class="card block">
+      <h4 style="margin-bottom:14px">📊 Filtros</h4>
+      <div class="chk-list">
+        <div class="chk"><div class="chk-ico">📶</div>¿ADX está por encima de 15?</div>
+        <div class="chk"><div class="chk-ico">🧭</div>¿DI+ &gt; DI− para LONG / DI− &gt; DI+ para SHORT?</div>
+        <div class="chk"><div class="chk-ico">✅</div>¿La vela confirma continuación sobre/bajo la EMA?</div>
+        <div class="chk"><div class="chk-ico">⏱️</div>¿No persigo una vela ya extendida?</div>
+      </div>
+    </div>
+    <div class="card block">
+      <h4 style="margin-bottom:14px">🛡️ Protección PropFirm</h4>
+      <div class="chk-list">
+        <div class="chk"><div class="chk-ico">💰</div>¿Riesgo ≤ 0.5% del balance actual?</div>
+        <div class="chk"><div class="chk-ico">📉</div>¿No he tocado el límite diario (−4.5%)?</div>
+        <div class="chk"><div class="chk-ico">🔒</div>¿Stop técnico claro fuera del ruido?</div>
+        <div class="chk"><div class="chk-ico">🎯</div>¿TP definido en RR 2:1 antes de entrar?</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-lbl">Errores más comunes</div>
+  <div class="g2">
+    <div class="card block">
+      <div class="rule-list">
+        <div class="rule"><strong><span class="rnum" style="background:var(--rd2);color:var(--rd)">✗</span>Entrar cuando el precio está lejos de la EMA</strong><p>La tentación de entrar después de ver una vela grande. Si el precio ya recorrió la mayor parte del espacio, el setup ya pasó. Espera el siguiente pullback.</p></div>
+        <div class="rule"><strong><span class="rnum" style="background:var(--rd2);color:var(--rd)">✗</span>Ignorar el ADX porque "parece tendencia"</strong><p>Visualmente puede parecer tendencia pero el ADX bajo 15 indica que la fuerza no es suficiente. El filtro existe exactamente para estos casos.</p></div>
+        <div class="rule"><strong><span class="rnum" style="background:var(--rd2);color:var(--rd)">✗</span>Operar en días de alta volatilidad sin contexto</strong><p>Noticias macro o datos on-chain pueden invalidar toda la estructura. En esos momentos el spread y el slippage en BTC se amplían y los stops se activan con más frecuencia.</p></div>
+      </div>
+    </div>
+    <div class="card block">
+      <div class="rule-list">
+        <div class="rule"><strong><span class="rnum" style="background:var(--rd2);color:var(--rd)">✗</span>Mover el stop loss para no ser parado</strong><p>Mover el stop es el error más destructivo en una PropFirm. El stop define tu riesgo. Si lo mueves, pierdes el control del drawdown y puedes invalidar la cuenta en una sola operación.</p></div>
+        <div class="rule"><strong><span class="rnum" style="background:var(--rd2);color:var(--rd)">✗</span>Sobreoperar para recuperar pérdidas</strong><p>Después de un día negativo, la urgencia de recuperar lleva a entrar en setups que no cumplen las reglas. Eso genera exactamente lo que intentabas evitar: más pérdidas.</p></div>
+        <div class="rule"><strong><span class="rnum" style="background:var(--gr2);color:var(--gr)">✓</span>Regla de oro</strong><p>Si dudas si entrar, no entras. La disciplina de saltarte setups mediocres vale más que capturar todos los movimientos. Una cuenta PropFirm se gana siendo selectivo, no activo.</p></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<div class="foot">EMA35 · BTC/USDT · 15min · Adaptado para modelo PropFirm no binario · No constituye asesoramiento financiero</div>
+
+<script>
+function tab(id, btn) {
+  document.querySelectorAll('.pane').forEach(p => p.classList.remove('on'));
+  document.querySelectorAll('.tab').forEach(b => b.classList.remove('on'));
+  document.getElementById('pane-' + id).classList.add('on');
+  btn.classList.add('on');
+}
+(function() {
+  const root = document.documentElement;
+  const btn = document.querySelector('[data-theme-toggle]');
+  let mode = 'dark'; root.setAttribute('data-theme', mode);
+  btn.addEventListener('click', () => {
+    mode = mode === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', mode);
+    btn.innerHTML = mode === 'dark'
+      ? '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>'
+      : '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>';
+  });
+})();
+</script>
+</body>
+</html>
